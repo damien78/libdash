@@ -101,15 +101,17 @@ Node*   DOMParser::ProcessNode              ()
         return node;
     } else if (type == Text)
     {
-       const char* text = (const char *) xmlTextReaderReadString(this->reader);
+       char* text = (char *) xmlTextReaderReadString(this->reader);
 
        if(text != NULL)
        {
            Node *node = new Node();
            node->SetType(type);
            node->SetText(text);
+#ifndef NDEBUG
            std::cout << "   " << text << std::endl;
-           delete text;
+#endif
+           xmlFree(text);           
            return node;
        }
     }
@@ -117,19 +119,25 @@ Node*   DOMParser::ProcessNode              ()
 }
 void    DOMParser::AddAttributesToNode      (Node *node)
 {
+#ifndef NDEBUG
     std::stringstream ss; // Parsed values
     ss << node->GetName() << ":" << std::endl;
-    if(xmlTextReaderHasAttributes(this->reader))
+#endif
+    if (xmlTextReaderHasAttributes(this->reader))
     {
         while(xmlTextReaderMoveToNextAttribute(this->reader))
         {
             std::string key      = (const char *) xmlTextReaderConstName(this->reader);
             std::string value    = (const char *) xmlTextReaderConstValue(this->reader);
             node->AddAttribute(key, value);
+#ifndef NDEBUG
             ss << "   " << key << "=" << value << std::endl;
+#endif
         }
     }
+#ifndef NDEBUG
     std::cout << ss.str();
+#endif
 }
 void    DOMParser::Print                    (Node *node, int offset)
 {
