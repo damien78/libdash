@@ -23,11 +23,15 @@ AbstractChunk::AbstractChunk        ()  :
                bytesDownloaded      (0)
 {
 }
-AbstractChunk::~AbstractChunk       ()
-{
+AbstractChunk::~AbstractChunk() {
     this->AbortDownload();
 
     DestroyThreadPortable(this->dlThread);
+
+    for (auto httpTransaction : this->httpTransactions) {
+        delete httpTransaction;
+    }
+    this->httpTransactions.clear();
 }
 
 void    AbstractChunk::AbortDownload                ()
