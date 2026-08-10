@@ -35,6 +35,8 @@ namespace dash
         {
             public:
                 DOMParser           (std::string url);
+                //Parse from memory. baseUri only supplies the MPD path base URL; nothing is fetched.
+                DOMParser           (const char *buffer, int size, std::string baseUri);
                 virtual ~DOMParser  ();
 
                 bool    Parse       ();
@@ -45,6 +47,8 @@ namespace dash
                 xmlTextReaderPtr    reader;
                 Node                *root;
                 std::string         url;
+                const char          *buffer;    //Not owned; NULL selects the parse-from-url path
+                int                 bufferSize;
 
                 void    Init                    ();
                 Node*   ProcessNode             ();

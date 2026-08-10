@@ -17,7 +17,18 @@ using namespace dash::helpers;
 DOMParser::DOMParser    (std::string url) :
            url          (url),
            reader       (NULL),
-           root         (NULL)
+           root         (NULL),
+           buffer       (NULL),
+           bufferSize   (0)
+{
+    this->Init();
+}
+DOMParser::DOMParser    (const char *buffer, int size, std::string baseUri) :
+           url          (baseUri),
+           reader       (NULL),
+           root         (NULL),
+           buffer       (buffer),
+           bufferSize   (size)
 {
     this->Init();
 }
@@ -33,7 +44,9 @@ Node*   DOMParser::GetRootNode              () const
 }
 bool    DOMParser::Parse                    ()
 {
-    this->reader = xmlReaderForFile(this->url.c_str(), NULL, 0);
+    this->reader = (this->buffer != NULL)
+                     ? xmlReaderForMemory(this->buffer, this->bufferSize, this->url.c_str(), NULL, 0)
+                     : xmlReaderForFile(this->url.c_str(), NULL, 0);
 
     if(this->reader == NULL)
         return false;

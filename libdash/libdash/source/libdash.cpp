@@ -18,3 +18,22 @@ __declspec(dllexport) IDASHManager* __cdecl CreateDashManager()
 {
     return new DASHManager();
 }
+__declspec(dllexport) mpd::IMPD* __cdecl CreateMpdFromMemory(const char *buffer, int size, const char *baseUri)
+{
+    if(buffer == NULL || size <= 0 || baseUri == NULL)
+        return NULL;
+
+    xml::DOMParser parser(buffer, size, baseUri);
+
+    uint32_t fetchTime = helpers::Time::GetCurrentUTCTimeInSec();
+
+    if (!parser.Parse())
+        return NULL;
+
+    mpd::MPD* mpd = parser.GetRootNode()->ToMPD();
+
+    if (mpd)
+        mpd->SetFetchTime(fetchTime);
+
+    return mpd;
+}
